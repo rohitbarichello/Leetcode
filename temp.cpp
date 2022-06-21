@@ -1,39 +1,46 @@
-class Solution {
+class Solution {  // 48 ms, faster than 99.64%
    public:
-    int jobScheduling(vector<int>& startTime, vector<int>& endTime, vector<int>& profit) {
-        int n = profit.size();
-        int dp[n];
+    vector<vector<int>> updateMatrix(vector<vector<int>> &mat) {
+        int m = mat.size();
+        int n = mat[0].size();
+        int INF = m + n;  // The distance of cells is up to (M+N)
 
-        pair<int, pair<int, int>> newarr[n];
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                if (mat[r][c] != 0) {
+                    int top = INF;
+                    int left = INF;
 
-        for (int i = 0; i < n; i++) {
-            newarr[i].first = endTime[i];
-            newarr[i].second.first = startTime[i];
-            newarr[i].second.second = profit[i];
-        }
+                    if (r - 1 >= 0) {
+                        top = mat[r - 1][c];
+                    }
+                    if (c - 1 >= 0) {
+                        left = mat[r][c - 1];
+                    }
 
-        sort(newarr, newarr + n);
-        for (int i = 0; i < n; i++) {
-            endTime[i] = newarr[i].first;
-            startTime[i] = newarr[i].second.first;
-            profit[i] = newarr[i].second.second;
-        }
-
-        dp[0] = profit[0];
-        for (int i = 1; i < n; i++) {
-            dp[i] = max(dp[i - 1], profit[i]);
-
-            for (int j = i - 1; j >= 0; j--) {
-                if (endTime[j] <= startTime[i]) {
-                    dp[i] = max(dp[i], profit[i] + dp[j]);
-                    break;
+                    mat[r][c] = min(top, left) + 1;
                 }
             }
         }
-        int ans = 0;
-        for (int i = 0; i < n; i++) {
-            ans = max(dp[i], ans);
+
+        for (int r = m - 1; r >= 0; r--) {
+            for (int c = n - 1; c >= 0; c--) {
+                if (mat[r][c] != 0) {
+                    int bottom = INF;
+                    int right = INF;
+
+                    if (r + 1 < m) {
+                        bottom = mat[r + 1][c];
+                    }
+                    if (c + 1 < n) {
+                        right = mat[r][c + 1];
+                    }
+
+                    mat[r][c] = min(mat[r][c], min(bottom, right) + 1);
+                }
+            }
         }
-        return ans;
+
+        return mat;
     }
 };
